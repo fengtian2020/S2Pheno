@@ -1,4 +1,4 @@
-# European-wide phenology parameters from Sentinel-2 calibrated with eddy covariance, PhenoCam and ground phenology observations
+# Europe-wide phenology from Sentinel-2: Calibration with eddy covariance, PhenoCam and ground phenology observations
 
 ## Authors
 Feng Tian, Zhanzhang Cai, Hongxiao Jin, Koen Hufkens, Helfried Scheifinger, Torbern Tagesson, Xiaoye Tong, Jonas Ardö, & Lars Eklundh
