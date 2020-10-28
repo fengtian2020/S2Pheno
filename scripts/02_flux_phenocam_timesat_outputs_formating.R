@@ -199,7 +199,7 @@ phenocamVIpheno1 <- phenocamVIpheno %>%
   mutate(validate = "GCC") %>% 
   # completely mismatch GCC and VI, likely due to large uncertaities in GCC location
   filter(!(ID %in% c("monteblanco_SH_1000", "monteblanco_EB_1000", "montenegro_SH_1000",
-                     "donanafuenteduque_WL_1000", "DE-Geb_AG_1000")))
+                     "donanafuenteduque_WL_1000", "DE-Geb_AG_1000", "borgocioffinorth_AG_1000")))
 
 VIpheno <- bind_rows(fluxVIpheno1, phenocamVIpheno1) 
 save(VIpheno, file = "data/RData/VIpheno_flux_phenocam.RData")
