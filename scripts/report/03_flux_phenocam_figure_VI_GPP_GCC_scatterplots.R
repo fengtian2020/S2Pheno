@@ -2,8 +2,6 @@ library(tidyverse)
 library(lubridate)
 library(ggpubr)
 
-
-load("data/RData/VItimesat_flux_phenocam.RData")
 load("data/RData/VIpheno_flux_phenocam.RData")
 
 VIpheno0 <- VIpheno %>% 
@@ -42,7 +40,7 @@ phenoData <- function(brdfm, vali){
   return(Gpheno)
 }
 
-phenoData("M", "GPP") %>% 
+phenoData("raw", "GPP") %>% 
   filter(thres_Gvar %in% c("15%", "25%", "45%"), thres_VI == 25, metric == "SOS", VIname == "PPI") %>% 
   group_by(thres_Gvar) %>% 
   summarise(`absolute bias` = mean(diff))
@@ -54,7 +52,7 @@ dat_bias <- data.frame(
   thres_Gvar = c("15%", "25%", "45%")
 )
 
-phenoData("M", "GPP") %>% 
+phenoData("raw", "GPP") %>% 
   filter(thres_Gvar %in% c("15%", "25%", "45%"), thres_VI == 25, metric == "SOS", VIname == "PPI") %>% 
   ggplot(aes(x = VI, y = Gvar)) +
   geom_abline(slope = 1, intercept = 0, color = "grey70")+
@@ -74,5 +72,5 @@ phenoData("M", "GPP") %>%
   stat_cor(aes(label = ..r.label..), method = "pearson", #size = 4.2,
            label.x.npc = "left", label.y.npc = "top")
   
-ggsave("figures/figure_VI_GPP_GCC_scatterplots.pdf",
+ggsave("figures/report/figure_VI_GPP_GCC_scatterplots_raw.pdf",
        width = 25, height = 10, units = "cm")

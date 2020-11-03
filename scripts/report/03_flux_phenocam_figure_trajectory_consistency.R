@@ -3,7 +3,6 @@ library(lubridate)
 library(ggpubr)
 
 load("data/RData/VItimesat_flux_phenocam.RData")
-load("data/RData/VIpheno_flux_phenocam.RData")
 
 
 VItimesat0 <- VItimesat %>% 
@@ -156,11 +155,11 @@ VIcomp <- function(variable, brdfm) {
 
 ggarrange(VIcomp("GPP", "raw"), VIcomp("GCC", "raw"), ncol = 1)
 
-ggsave("figures/figure_trajectory_consistency_raw.pdf",
+ggsave("figures/report/figure_trajectory_consistency_raw.pdf",
        width = 35, height = 40, units = "cm")
 
 ggarrange(VIcomp("GPP", "M"), VIcomp("GCC", "M"), ncol = 1)
 
-ggsave("figures/figure_trajectory_consistency_NBAR.pdf",
+ggsave("figures/report/figure_trajectory_consistency_NBAR.pdf",
        width = 35, height = 40, units = "cm")
 

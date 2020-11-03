@@ -1,6 +1,5 @@
 library(tidyverse)
 
-load("data/RData/VItimesat_flux_phenocam.RData")
 load("data/RData/VIpheno_flux_phenocam.RData")
 
 

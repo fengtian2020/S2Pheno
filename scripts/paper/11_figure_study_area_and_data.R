@@ -15,7 +15,7 @@ europe <- ne_countries(continent = "europe", returnclass = "sf", scale = 50) %>%
 
 fluxsites <- VIpheno %>% filter(validate == "GPP") %>% distinct(ID) %>% pull()
 
-flux <- read_sf("data/1_gee_raw_reflectance/flux/flux_drought2018_site_S2_NBAR_raw_201704_202003_100m_SCL45_mean.shp") %>% 
+flux <- read_sf("data/1_gee_extracted_data/flux/flux_drought2018_site_S2_NBAR_raw_201704_202003_100m_SCL45_mean.shp") %>% 
   st_centroid() %>% 
   as_tibble() %>%
   distinct(ID, .keep_all = T) %>%
@@ -27,7 +27,7 @@ flux <- read_sf("data/1_gee_raw_reflectance/flux/flux_drought2018_site_S2_NBAR_r
 
 phenocamsites <- VIpheno %>% filter(validate == "GCC") %>% distinct(ID) %>% pull()
 
-phenocam <- read_sf("data/1_gee_raw_reflectance/phenocam/phenocam_S2_NBAR_raw_201704_202003_10m_SCL45.shp") %>%
+phenocam <- read_sf("data/1_gee_extracted_data/phenocam/phenocam_S2_NBAR_raw_201704_202003_10m_SCL45.shp") %>%
   as_tibble() %>%
   mutate(ID = paste(site, veg_type, str_pad(roi, 4, pad = "0"), sep = "_")) %>% 
   distinct(ID, .keep_all = T) %>% 
@@ -94,7 +94,7 @@ ground <- flux %>%
                        labels = c("Random points (10 000 pixels)",
                                   "PEP725 (1321 sites)",
                                   "Eddy covariance (49 sites)",
-                                  "PhenoCam (35 sites)",
+                                  "PhenoCam (32 sites)",
                                   "Transects (4 500 pixels)"))) %>%
   st_as_sf(coords = c("lon", "lat"))
 st_crs(ground) <- 4326

@@ -3,7 +3,7 @@ library(lubridate)
 
 ###############################
 # example time series of one pep site
-load("Sen2Pheno/RData/pepVI4kmMean.RData")
+load("data/RData/pepVI4kmMean.RData")
 
 write_csv(pepVI %>% filter(str_detect(ID, "8212")) %>% 
             select(ID, date,PPI_raw_loeFiltered),
@@ -30,6 +30,6 @@ pepEX %>%
         legend.position = "top",
         panel.grid = element_blank()) 
 
-ggsave("figures/figure_example_PEP_site_curves.pdf",
+ggsave("figures/report/figure_example_PEP_site_curves.pdf",
        width = 18, height = 18, units = "cm")
 

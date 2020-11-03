@@ -2,7 +2,6 @@ library(tidyverse)
 library(lubridate)
 
 load("data/RData/VItimesat_flux_phenocam.RData")
-load("data/RData/VIpheno_flux_phenocam.RData")
 
 #time series comparison between GPP/GCC and VIs
 VItimesat1 <- VItimesat %>% 
@@ -44,7 +43,7 @@ VItimesatZ <- VItimesat1 %>%
 
 ########
 tsplot <- function(df, lc, co. = co) {
-  ggplot(data = df %>% filter(LC == lc, BRDF == "NBAR"),
+  ggplot(data = df %>% filter(LC == lc, BRDF == "TOC"),
          aes(x = date, col = name)) +
     geom_line(aes(y = lineZ), size = 0.5, show.legend = T) +
     geom_point(aes(y = pointZ), size = 0.3, show.legend = T) +
@@ -78,7 +77,7 @@ ggarrange(LCbf, LCcf, LCmf, LCa, LCg, LCw,
           font.label = list(size = 17),
           common.legend = F, heights = c(1.5, 1.5, 0.8, 1.1, 1.5, 1.1),
           ncol = 1)
-ggsave("figures/figure_GCC_curves_NBAR.pdf",
+ggsave("figures/report/figure_GCC_curves_TOC.pdf",
        width = 22, height = 80, units = "cm")
 
 
@@ -100,7 +99,7 @@ ggarrange(LCbf, LCcf, LCmf, LCa, LCg, LCw,
           font.label = list(size = 17),
           common.legend = F, heights = c(1.25, 2, 1.25, 2, 0.85, 1.25),
           ncol = 1)
-ggsave("figures/figure_GPP_curves_NBAR.pdf",
+ggsave("figures/report/figure_GPP_curves_TOC.pdf",
        width = 22, height = 80, units = "cm")
 
 
@@ -130,7 +129,7 @@ VItimesatZ %>%
         legend.text = element_text(size = 17),
         legend.title = element_blank())
 
-ggsave("figures/figure_VI_GPP_GCC_example_curves.pdf",
+ggsave("figures/report/figure_VI_GPP_GCC_example_curves_TOC.pdf",
        width = 20, height = 22, units = "cm")
 
 
