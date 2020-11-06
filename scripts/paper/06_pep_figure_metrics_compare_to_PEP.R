@@ -3,36 +3,50 @@ library(tidyverse)
 
 load("data/RData/pepS2.RData")
 
-# brdf <- "M"
-# 
-# pepS2 %>% 
-#   filter(BRDF == "M", phasePair == "Leaf unfolded 50%") %>% 
-#   select(-c(BRDF, year)) %>%
-#   group_by(VIname, thres, type) %>% 
-#   # summarise(cor = cor(PEPdoy, S2doy)^2) %>% 
-#   # ungroup() %>% 
-#   mutate(thres = as.numeric(str_extract(thres, "\\d{2}")))
-#   ggplot(aes(x = S2doy, y = PEPdoy)) +
-#   geom_point(alpha = 0.1) +
-#   # scale_x_continuous(limits = c())
-#   facet_grid(type ~ VIname)
-# 
-# pepS2 %>% 
-#   # group_by(thres, type) %>% 
-#   # summarise(cor = cor(PEPdoy, S2doy)^2) %>% 
-#   # ungroup() %>% 
-#   mutate(thres = as.numeric(str_extract(thres, "\\d{2}"))) %>% 
-#   filter(BRDF == "M", phasePair == "Leaf unfolded 50%", VIname == "PPI", thres > 20) %>% 
-#   select(-c(BRDF, year, phasePair, VIname)) %>%
-#   
-#   ggplot(aes(x = S2doy, y = PEPdoy)) +
-#   geom_point(alpha = 0.1) +
-#   # scale_x_continuous(limits = c(0, 200))+
-#   # scale_y_continuous(limits = c(0, 200))+
-#   facet_grid(thres ~ type)
+
+# plot scatterplots -------------------------------------------------------
+
+brdf <- "M"
+
+pepS2f3 <- pepS2 %>% 
+  mutate(foroutlier = PEPdoy - S2doy) %>% 
+  group_by(VIname, phasePair, thres, type, BRDF) %>% 
+  mutate(across(foroutlier, ~ ifelse(abs(. - mean(., na.rm = T)) > sd(., na.rm = T) * 3, NA, 1))) %>% 
+  filter(!is.na(foroutlier)) %>% 
+  
+  mutate(foroutlier = PEPdoy - S2doy) %>% 
+  group_by(VIname, phasePair, thres, type, BRDF) %>% 
+  mutate(across(foroutlier, ~ ifelse(abs(. - mean(., na.rm = T)) > sd(., na.rm = T) * 3, NA, 1))) %>% 
+  filter(!is.na(foroutlier)) %>% 
+  
+  mutate(foroutlier = PEPdoy - S2doy) %>% 
+  group_by(VIname, phasePair, thres, type, BRDF) %>% 
+  mutate(across(foroutlier, ~ ifelse(abs(. - mean(., na.rm = T)) > sd(., na.rm = T) * 3, NA, 1))) %>% 
+  filter(!is.na(foroutlier)) 
+
+pepS2f3 %>%
+  filter(BRDF == "M", thres == "25%", VIname == "PPI") %>% #, phasePair == "Leaf unfolded 50%"
+  select(-c(thres, BRDF, year)) %>%
+  group_by(VIname, type) %>%
+  ggplot(aes(x = S2doy, y = PEPdoy)) +
+  geom_point(alpha = 0.2, size = 1) +
+  geom_smooth(method = "lm", size = 0.8) +
+  facet_grid(type ~ phasePair, scales = "free")+
+  labs(x = "VI-derived SOS/EOS (day of year)",
+       y = "PEP725 phenophase (day of year)") +
+  theme_bw(base_size = 17)+
+  theme(panel.grid = element_blank(),
+        legend.title = element_blank(),
+        legend.position = "top",
+        legend.text = element_text(size = 17))
+ggsave("figures/figure_metrics_compare_to_PEP_scatterplots_outlierfiltered_NBAR.pdf",
+       width = 35, height = 20, units = "cm")
+
+
+# parameters of R2 and mean bias ------------------------------------------
 
 pepcmb <- function(brdf) {
-  diffdf <- pepS2 %>% 
+  diffdf <- pepS2f3 %>% 
     filter(BRDF == brdf) %>% 
     select(-c(BRDF, year)) %>%
     group_by(VIname, phasePair, thres, type) %>% 
@@ -40,16 +54,18 @@ pepcmb <- function(brdf) {
     ungroup() %>% 
     mutate(thres = as.numeric(str_extract(thres, "\\d{2}"))) 
   
-  cordf <- pepS2 %>% 
+  s <- 300
+  
+  cordf <- pepS2f3 %>% 
     filter(BRDF == brdf) %>% 
     select(-c(BRDF, year)) %>%
     group_by(VIname, phasePair, thres, type) %>% 
     summarise(cor = cor(PEPdoy, S2doy, 
-                        use = "pairwise.complete.obs")^2 * 500 - 150) %>% 
+                        use = "pairwise.complete.obs")^2 * s - 150) %>% 
     ungroup() %>% 
     mutate(thres = as.numeric(str_extract(thres, "\\d{2}")))
   
-  stddf <- pepS2 %>% 
+  stddf <- pepS2f3 %>% 
     filter(BRDF == brdf) %>% 
     select(-c(BRDF, year)) %>%
     group_by(VIname, phasePair, thres, type) %>% 
@@ -82,7 +98,7 @@ pepcmb <- function(brdf) {
     
     scale_y_continuous("Time difference (day)",breaks = c(-100, 0, 100),
                        sec.axis = 
-                         sec_axis(~(. + 150) / 500, breaks = c(0, 0.2, 0.4),
+                         sec_axis(~(. + 150) / s, #breaks = c(0, 0.2, 0.4),
                                   name = expression(italic("R"^"2"))))+
     facet_grid(type ~ phasePair) +
     labs(x = "VI amplitude threshold (%)") +
@@ -95,12 +111,12 @@ pepcmb <- function(brdf) {
 }
 
 pepcmb("M")
-ggsave("figures/figure_metrics_compare_to_PEP_NBAR.pdf",
+ggsave("figures/figure_metrics_compare_to_PEP_outlierfiltered_NBAR.pdf",
        width = 35, height = 20, units = "cm")
 
 
 pepcmb("raw")
-ggsave("figures/figure_metrics_compare_to_PEP_raw.pdf",
+ggsave("figures/figure_metrics_compare_to_PEP_outlierfiltered_raw.pdf",
        width = 35, height = 20, units = "cm")
 
   
