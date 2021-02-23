@@ -46,7 +46,7 @@ pepS2 <- raw %>%
                                        "Fresh green 25%",
                                        "Start of harvest",
                                        "Silage harvest",
-                                       "Coloration  50%",
+                                       "Coloration 50%",
                                        "Leaf fallen 50%")),
          VIname = factor(VIname, levels = c("NDVI", "EVI2", "PPI"))) %>% 
   

@@ -52,6 +52,12 @@ phenocam <- tibble(ID = rep(sites, each = length(days)),
   }) %>% ungroup() %>% 
   mutate(LC = str_split(ID, "_", simplify = T)[,2])
 
+# phenocam %>% rename(GCC_raw = GCC) %>%
+#   pivot_longer(c(GCC_raw, GCC_loess, GCC_loess1), names_to = "process", values_to = "gcc") %>%
+#   ggplot(aes(x = date, y = gcc)) +
+#   geom_point(aes(y = gcc, color = process)) +
+#   # scale_color_manual(values = c("red", "black")) +
+#   facet_wrap(vars(ID), scales = "free")
 
 # Sentinel 2 at phenocam sites --------------------------------------------
 

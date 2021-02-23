@@ -42,13 +42,13 @@ phenoData <- function(brdfm, vali){
   return(Gpheno)
 }
 phenoThres <- function(brdfm) {
-  bind_rows(phenoData(brdfm, "GPP"), phenoData(brdfm, "GCC")) %>% 
+  data <- bind_rows(phenoData(brdfm, "GPP"), phenoData(brdfm, "GCC")) %>% 
     mutate(validate = factor(validate, levels = c("GPP", "GCC"))) %>%
     
     group_by(thres_Gvar, metric, thres_VI, VIname, validate) %>% 
     summarise(meanDiff = mean(diff, na.rm = T),
               cor = cor(Gvar, VI, method = "pearson",
-                        use = "pairwise.complete.obs")*100) %>%
+                        use = "pairwise.complete.obs")) %>%
     ungroup() %>% 
     group_by(VIname, metric, thres_VI, validate) %>% 
     slice(which.min(abs(meanDiff))) %>% 
@@ -56,35 +56,49 @@ phenoThres <- function(brdfm) {
     pivot_longer(cols = c(meanDiff, cor),
                  names_to = "measure",
                  values_to = "val") %>% 
-    mutate(thres_Gvar = ifelse(measure == "cor", NA, thres_Gvar)) %>% 
+    mutate(thres_Gvar = ifelse(measure == "cor", NA, thres_Gvar))
     
+  plotR <- data %>% filter(measure == "cor") %>% 
     ggplot(aes(x = thres_VI, color = VIname)) +
-    geom_vline(xintercept = 25, color = "grey60", linetype = 2)+
-    geom_point(aes(y = val, shape = measure), size = 2.5) +
-    geom_line(aes(y = val, linetype = measure), size = .8) +
-    geom_text(aes(y = val, label = thres_Gvar),
-              position = position_nudge(y = -2))+
-    scale_x_continuous(breaks = seq(5,50,5))+
-    # geom_point(aes(y = cor*100)) +
-    # geom_line(aes(y = cor*100), linetype = 2) +
-    scale_color_manual("VI", values = c("tan3", "blue", "firebrick3")) +
-    scale_shape_manual(values = c(1, 16),
-                       labels = c("Spatial correlation", "Mean absolute bias")) +
-    scale_linetype_manual(values = c(2, 1),
-                          labels = c("Spatial correlation", "Mean absolute bias")) +
-    scale_y_continuous("Mean absolute bias (day)", breaks = seq(0, 80, 20),
-                       sec.axis = 
-                         sec_axis(~./100,
-                                  breaks = seq(0, .8, .2),
-                                  name = expression(paste("Spatial correlation (",italic("R"),")", sep = ""))))+
-    # facet_wrap(vars(metric)) +
-    facet_grid(rows = vars(metric), cols = vars(validate), scales = "free")+
+    geom_point(aes(y = val), size = 1.8) +
+    geom_line(aes(y = val), size = .6) +
+    scale_x_continuous(breaks = seq(10,50,10))+
+    scale_color_manual("VI", values = c("#FE6100", "#648FFF", "#DC267F")) +
+    scale_y_continuous(expression(paste(italic("R")))) +
+    facet_nested(. ~ validate + metric) +
     theme_bw(base_size = 17)+
-    labs(x = "VI amplitude threshold (%)") +
-    theme(panel.grid = element_blank(),
-          legend.position = "top",
-          legend.title = element_blank(),
-          legend.text = element_text(size = 17))
+    labs(x = "VI amplitude threshold (%)", title = "Spatial correlation") +
+    theme(legend.title = element_blank(),
+          legend.text = element_text(size = 17),
+          panel.grid.minor = element_blank(),
+          panel.grid.major = element_line(size = 0.2),
+          axis.line = element_blank(),
+          panel.border = element_rect(size = 0.4),
+          strip.background = element_rect(size = 0.4))
+  
+  plotB <- data %>% filter(measure == "meanDiff") %>% 
+    ggplot(aes(x = thres_VI, color = VIname)) +
+    geom_point(aes(y = val), size = 1.8) +
+    geom_line(aes(y = val), size = .6) +
+    scale_x_continuous(breaks = seq(10,50,10))+
+    scale_color_manual("VI", values = c("#FE6100", "#648FFF", "#DC267F")) +
+    scale_y_continuous("Day") +
+    facet_nested(. ~ validate + metric) +
+    theme_bw(base_size = 17)+
+    labs(x = "VI amplitude threshold (%)", title = "Mean absolute bias") +
+    theme(legend.title = element_blank(),
+          legend.text = element_text(size = 17),
+          panel.grid.minor = element_blank(),
+          panel.grid.major = element_line(size = 0.2),
+          axis.line = element_blank(),
+          panel.border = element_rect(size = 0.4),
+          strip.background = element_rect(size = 0.4))
+  
+  ggarrange(plotB, plotR,
+            labels = c("a", "b"),
+            common.legend = T,
+            ncol = 1, nrow = 2,
+            font.label = list(size = 19))
 }
 
 phenoThres("M")

@@ -34,7 +34,7 @@ forbrdfvalue  %>%
   theme_bw(base_size = 15) +
   theme(panel.grid = element_blank())+
   stat_regline_equation(aes(label =  paste(..eq.label..)), size = 4)+
-  stat_cor(aes(label = ..rr.label..), method = "pearson",
+  stat_cor(aes(label = ..r.label..), method = "pearson",
            size = 4, color = "black",geom = "text",
            label.y.npc = 0.85,digits = 2)
 
@@ -77,22 +77,26 @@ tbpsos <- databrdf %>%
   filter(metric == "SOS") %>% 
   mutate(VIname = factor(VIname, levels = c("NDVI", "EVI2", "PPI"))) %>% 
   
-  ggplot(aes(raw, M)) +
+  ggplot(aes(M, raw)) +
   geom_bin2d(bins = 150) +
   scale_x_continuous(n.breaks = 4)+
   scale_y_continuous(n.breaks = 4)+
-  scale_fill_viridis_c(direction = -1) +
+  scale_fill_viridis_c("Density", direction = -1) +
   # geom_abline(slope = 1, intercept = 0, color = "grey40") +
   # facet_grid(metric ~ VIname, scales = "free") +
   facet_wrap(vars(VIname), scales = "fixed") +
   theme_bw(base_size = 15)+
-  theme(panel.grid = element_blank(),
-        # legend.position = "top",
-        legend.text = element_text(size = 15)) +
-  labs(y = "SOS from NBAR-based VI",
-       x = "SOS from TOC-based VI")+
+  theme(legend.position = "top",
+        legend.text = element_text(size = 15),
+        panel.grid = element_blank(),
+        title = element_text(color = "black"),
+        axis.line = element_blank(),
+        panel.border = element_rect(size = 0.4),
+        strip.background = element_rect(size = 0.4)) +
+  labs(x = "SOS from NBAR-based VI",
+       y = "SOS from TOC-based VI")+
   stat_regline_equation(aes(label =  paste(..eq.label..)), size = 4)+
-  stat_cor(aes(label = ..rr.label..), method = "pearson",
+  stat_cor(aes(label = ..r.label..), method = "pearson",
            size = 4, color = "black",geom = "text",
            label.y.npc = 0.85)
 
@@ -100,22 +104,26 @@ tbpeos <- databrdf %>%
   filter(metric == "EOS") %>% 
   mutate(VIname = factor(VIname, levels = c("NDVI", "EVI2", "PPI"))) %>% 
   
-  ggplot(aes(raw, M)) +
+  ggplot(aes(M, raw)) +
   geom_bin2d(bins = 150) +
   scale_x_continuous(n.breaks = 4)+
   scale_y_continuous(n.breaks = 4)+
-  scale_fill_viridis_c(direction = -1) +
+  scale_fill_viridis_c("Density", direction = -1) +
   # geom_abline(slope = 1, intercept = 0, color = "grey40") +
   # facet_grid(metric ~ VIname, scales = "free") +
   facet_wrap(vars(VIname), scales = "fixed") +
   theme_bw(base_size = 15)+
-  theme(panel.grid = element_blank(),
-        # legend.position = "top",
-        legend.text = element_text(size = 15)) +
-  labs(y = "EOS from NBAR-based VI",
-       x = "EOS from TOC-based VI")+
+  theme(legend.position = "top",
+        legend.text = element_text(size = 15),
+        panel.grid = element_blank(),
+        title = element_text(color = "black"),
+        axis.line = element_blank(),
+        panel.border = element_rect(size = 0.4),
+        strip.background = element_rect(size = 0.4)) +
+  labs(x = "EOS from NBAR-based VI",
+       y = "EOS from TOC-based VI")+
   stat_regline_equation(aes(label =  paste(..eq.label..)), size = 4)+
-  stat_cor(aes(label = ..rr.label..), method = "pearson",
+  stat_cor(aes(label = ..r.label..), method = "pearson",
            size = 4, color = "black",geom = "text",
            label.y.npc = 0.85, digits = 2)
 

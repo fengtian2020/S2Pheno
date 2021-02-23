@@ -15,7 +15,7 @@ pepS2 %>% filter(thres == "25%", BRDF == "raw", VIname == "NDVI", type != "Crop"
         # legend.key.size = unit(1, "cm"),
         legend.position = "top",
   ) 
-ggsave("figures/figure_histogram_pep_data.pdf",
+ggsave("figures/figure_density_pep_data.pdf",
        width = 20, height = 10, units = "cm")
 
 

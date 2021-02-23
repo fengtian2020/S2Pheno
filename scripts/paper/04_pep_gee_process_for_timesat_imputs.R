@@ -7,11 +7,11 @@ library(ggpubr)
 
 pep <- read_csv("data/0_ground_data_raw/pep725/pep725_smets0.csv") 
 pep %>% filter(year %in% c(2018, 2019),
-               phase_id %in% c(10, 11, 95, 100, 151, 182, 205, 223)) %>% 
-  add_count(phase_id) %>% 
-  distinct(phase_id, .keep_all = T) %>% 
-  select(phase_id, n) %>% 
-  arrange(phase_id) %>% 
+               phase_id %in% c(10, 11, 95, 100, 151, 182, 205, 223)) %>% distinct(genus) %>% arrange(genus) %>% 
+  # add_count(phase_id) %>% 
+  # distinct(phase_id, .keep_all = T) %>% 
+  # select(phase_id, n) %>% 
+  # arrange(phase_id) %>% 
   print(n = 100)
 
 level_key <- c("Acer" = "Broad-leaved-tree",
@@ -29,7 +29,7 @@ level_key <- c("Acer" = "Broad-leaved-tree",
                "Helianthus" = "Crop",
                "Hordeum" = "Crop",
                "Juglans" = "Fruit-tree",
-               "Larix" = "Coniferous-tree",
+               "Larix" = "Deciduous Coniferous-tree",
                "Malus" = "Fruit-tree",
                "meadow" = "Meadow",
                "Picea" = "Coniferous-tree",
@@ -41,7 +41,7 @@ level_key <- c("Acer" = "Broad-leaved-tree",
                "Quercus" = "Broad-leaved-tree",
                "Ribes" = "Fruit-tree",
                "Robinia" = "Broad-leaved-tree",
-               "Rosmarinus" = "Coniferous-tree",
+               "Rosmarinus" = "other",
                "Salix" = "Broad-leaved-tree",
                "Sambucus" = "Broad-leaved-tree",
                "Secale" = "Crop",
@@ -62,6 +62,9 @@ pepi <- pep %>%
   mutate(type = recode(genus, !!!level_key)) %>% 
   filter(type %in% c("Meadow", "Broad-leaved-tree", "Coniferous-tree")) 
 
+pepi %>% add_count(genus) %>% distinct(genus, n) %>% arrange(genus)
+
+write_csv(pepi, file = "data/0_ground_data_raw/pep725/pep725_in_use.csv")
 
 # read data and calculate VIs ---------------------------------------------
 

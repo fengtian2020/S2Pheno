@@ -11,7 +11,7 @@ load("data/RData/fluxVI.RData")
 forscale <- fluxVI %>%
   filter(year(date) == 2018) %>% 
   group_by(ID) %>%
-  summarise(across(c(GPP_loess, contains("_raw_loeFiltered")),
+  summarise(across(c(GPP, contains("_M_loeFiltered")),
                    list(mean = mean, sd = sd), na.rm = T, 
                    .names = "{col}_{fn}")) %>% 
   rename_with(~ paste0(str_extract(., "^[A-Z2]{3,4}"), 
@@ -21,7 +21,7 @@ forscale <- fluxVI %>%
 ###  TIMESAT smoothing time series
 
 fluxVItimesat <- read_csv("data/3_timesat_outputs/smooth_time_series/smoothed_Flux_sites_S2_VI_SCL45_100m_mean_newDL.csv") %>% 
-  select(ID, date, 
+  select(ID, date, GPP, 
          EVI2_M_loeFiltered_fit = EVI2_M_loeFiltered,
          EVI2_raw_loeFiltered_fit = EVI2_raw_loeFiltered,
          PPI_M_loeFiltered_fit = PPI_M_loeFiltered,
@@ -29,13 +29,13 @@ fluxVItimesat <- read_csv("data/3_timesat_outputs/smooth_time_series/smoothed_Fl
          NDVI_M_loeFiltered_fit = NDVI_M_loeFiltered,
          NDVI_raw_loeFiltered_fit = NDVI_raw_loeFiltered,
   ) %>%
-  right_join(fluxVI) %>%
+  right_join(fluxVI %>% rename(GPP_raw = GPP)) %>%
   left_join(forscale) %>%
   mutate(LC = fct_relevel(factor(LC), "Broad-leaved forest",
                           "Coniferous forest", "Mixed forest",
                           "Agriculture", "Grassland", "Wetland")) %>%
   group_by(ID) %>% 
-  mutate(across(c(GPP, GPP_loess), 
+  mutate(across(c(GPP, GPP_raw), 
                 ~ (.x - GPPmean)/GPPsd, .names = "{col}_Z")) %>% 
   mutate(across(c(contains("NDVI_raw"), contains("NDVI_M")),
                 ~ (.x - NDVImean)/NDVIsd, .names = "{col}_Z")) %>% 
@@ -68,7 +68,7 @@ fluxLC <- read_sf("data/1_gee_extracted_data/flux/flux_drought2018_site_CORINE_L
 
 ### amplitude thresholds
 files <- Sys.glob("data/3_timesat_outputs/phenometrics/flux/*.csv") %>%
-  str_subset("(GPP_loess|PPI_M_loeFiltered|EVI2_M_loeFiltered|NDVI_M_loeFiltered|PPI_raw_loeFiltered|EVI2_raw_loeFiltered|NDVI_raw_loeFiltered)")
+  str_subset("(GPP|PPI_M_loeFiltered|EVI2_M_loeFiltered|NDVI_M_loeFiltered|PPI_raw_loeFiltered|EVI2_raw_loeFiltered|NDVI_raw_loeFiltered)")
 
 fluxVIpheno <- NULL
 for (i in files) {
@@ -84,7 +84,7 @@ for (i in files) {
               BRDF = BRDF,
               VIname = VIname) %>% 
     left_join(fluxLC)
-  if (tmp$BRDF[1] == "loe") {
+  if (tmp$BRDF[1] == "Flu") {
     tmp <- mutate(tmp, BRDF = "raw") %>% bind_rows(mutate(tmp, BRDF = "M"))
   }
   fluxVIpheno <- bind_rows(fluxVIpheno, tmp)
@@ -100,7 +100,7 @@ load("data/RData/phenocamVI.RData")
 forscale <- phenocamVI %>%
   filter(year(date) == 2018) %>% 
   group_by(ID) %>%
-  summarise(across(c(GCC_loess, contains("_raw_loeFiltered")),
+  summarise(across(c(GCC, contains("_raw_loeFiltered")),
                    list(mean = mean, sd = sd), na.rm = T, 
                    .names = "{col}_{fn}")) %>% 
   rename_with(~ paste0(str_extract(., "^[A-Z2]{3,4}"), 
@@ -110,20 +110,20 @@ forscale <- phenocamVI %>%
 ### TIMESAT fitting results 
 
 phenocamVItimesat <- read_csv("data/3_timesat_outputs/smooth_time_series/smoothed_PhenoCam_sites_S2_VI_SCL45_10m_newDL.csv") %>% 
-  select(ID, date, GCC_loess, 
+  select(ID, date, GCC, 
          EVI2_M_loeFiltered_fit = EVI2_M_loeFiltered,
          EVI2_raw_loeFiltered_fit = EVI2_raw_loeFiltered,
          PPI_M_loeFiltered_fit = PPI_M_loeFiltered,
          PPI_raw_loeFiltered_fit = PPI_raw_loeFiltered,
          NDVI_M_loeFiltered_fit = NDVI_M_loeFiltered,
          NDVI_raw_loeFiltered_fit = NDVI_raw_loeFiltered) %>%
-  right_join(phenocamVI %>% select(-GCC_loess)) %>% 
+  right_join(phenocamVI %>% rename(GCC_raw = GCC)) %>% 
   left_join(forscale) %>% 
   mutate(LC = fct_relevel(factor(LC), "Broad-leaved forest",
                           "Coniferous forest", "Mixed forest",
                           "Agriculture", "Grassland", "Wetland")) %>%
   group_by(ID) %>% 
-  mutate(across(c(GCC, GCC_loess), 
+  mutate(across(c(GCC, GCC_raw), 
                 ~ (.x - GCCmean)/GCCsd, .names = "{col}_Z")) %>% 
   mutate(across(c(contains("NDVI_raw"), contains("NDVI_M")),
                 ~ (.x - NDVImean)/NDVIsd, .names = "{col}_Z")) %>% 
@@ -138,7 +138,7 @@ phenocamVItimesat <- read_csv("data/3_timesat_outputs/smooth_time_series/smoothe
 
 ### amplitude thresholds
 files <- Sys.glob("data/3_timesat_outputs/phenometrics/phenocam/*.csv") %>%
-  str_subset("(GCC_loess|PPI_M_loeFiltered|EVI2_M_loeFiltered|NDVI_M_loeFiltered|PPI_raw_loeFiltered|EVI2_raw_loeFiltered|NDVI_raw_loeFiltered)")
+  str_subset("(GCC|PPI_M_loeFiltered|EVI2_M_loeFiltered|NDVI_M_loeFiltered|PPI_raw_loeFiltered|EVI2_raw_loeFiltered|NDVI_raw_loeFiltered)")
 
 phenocamVIpheno <- NULL
 for (i in files) {
@@ -154,7 +154,7 @@ for (i in files) {
               BRDF = BRDF,
               VIname = VIname) %>% 
     mutate(LC = str_split(ID, "_", simplify = T)[,2])
-  if (tmp$BRDF[1] == "loe") {
+  if (tmp$BRDF[1] == "Phe") {
     tmp <- mutate(tmp, BRDF = "raw") %>% 
       bind_rows(mutate(tmp, BRDF = "M"))
   }
@@ -187,7 +187,7 @@ phenocamVItimesat1 <- phenocamVItimesat %>%
   rename_at(vars(contains("GCC")), ~str_replace(., "GCC", "Gvar")) %>% 
   # completely mismatch GCC and VI, likely due to large uncertaities in GCC location
   filter(!(ID %in% c("monteblanco_SH_1000", "monteblanco_EB_1000", "montenegro_SH_1000",
-                     "donanafuenteduque_WL_1000", "DE-Geb_AG_1000")))
+                     "donanafuenteduque_WL_1000", "DE-Geb_AG_1000", "borgocioffinorth_AG_1000")))
 
 VItimesat <- bind_rows(fluxVItimesat1, phenocamVItimesat1)
 save(VItimesat, file = "data/RData/VItimesat_flux_phenocam.RData")
@@ -196,7 +196,7 @@ save(VItimesat, file = "data/RData/VItimesat_flux_phenocam.RData")
 fluxVIpheno1 <- fluxVIpheno %>% 
   mutate(validate = "GPP")
 phenocamVIpheno1 <- phenocamVIpheno %>% 
-  mutate(validate = "GCC") %>% 
+  mutate(validate = "GCC")  %>% 
   # completely mismatch GCC and VI, likely due to large uncertaities in GCC location
   filter(!(ID %in% c("monteblanco_SH_1000", "monteblanco_EB_1000", "montenegro_SH_1000",
                      "donanafuenteduque_WL_1000", "DE-Geb_AG_1000", "borgocioffinorth_AG_1000")))

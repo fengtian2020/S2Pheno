@@ -35,7 +35,7 @@ level_key <- c(`313` = "Mixed forest",
                `221` = "Agriculture",
                `243` = "Agriculture",
                `244` = "Agriculture")
-fluxLC <- read_sf("data/1_gee_raw_reflectance/flux/flux_drought2018_site_CORINE_LC_100m.shp") %>%
+fluxLC <- read_sf("data/1_gee_extracted_data/flux/flux_drought2018_site_CORINE_LC_100m.shp") %>%
   as_tibble() %>% filter(year == 2018, !is.na(b1)) %>% 
   mutate(LC = recode(b1, !!!level_key)) %>% 
   select(ID, LC)
@@ -95,6 +95,9 @@ flux <- tibble(ID = rep(IDlist, each = length(days)),
       mutate(GPP_loess = predict(loess(GPP ~ index, data = ., span = 0.2, 
                                        family = "symmetric",
                                        na.action = na.exclude)),
+             GPP_loess1 = predict(loess(GPP ~ index, data = ., span = 0.1, 
+                                       family = "symmetric",
+                                       na.action = na.exclude)),
              NBAR_NIR_M_loeFilter = loessFilter(., NBAR_NIR_M),
              NBAR_Red_M_loeFilter = loessFilter(., NBAR_Red_M),
              NIR_raw_loeFilter = loessFilter(., NIR_raw),
@@ -103,6 +106,12 @@ flux <- tibble(ID = rep(IDlist, each = length(days)),
   }) %>% ungroup() %>% 
   filter(!is.na(LC))
 
+flux %>% rename(GPP_raw = GPP) %>% select(ID, date, GPP_raw, GPP_loess, GPP_loess1) %>% 
+  pivot_longer(c(GPP_raw, GPP_loess, GPP_loess1), names_to = "process", values_to = "gpp") %>% 
+  ggplot(aes(x = date, y = gpp)) + 
+  geom_point(aes(y = gpp, color = process)) + 
+  # scale_color_manual(values = c("red", "black")) +
+  facet_wrap(vars(ID), scales = "free")
 
 
 # calculate VIs based on raw and smoothed reflectance ---------------------
@@ -147,5 +156,20 @@ write_csv(fluxVI %>%
           "data/2_timesat_inputs/Flux_sites_S2_VI_SCL45_100m_mean.csv")
 
 
+fluxVI %>% ggplot(aes(date)) + geom_point(aes(y = GPP))+
+  geom_point(aes(y = GPP_loess), color = "red") + 
+  facet_wrap(vars(ID), scales = "free")
 
-
+# read_csv("data/3_timesat_outputs/smooth_time_series/smoothed_Flux_sites_S2_VI_SCL45_100m_mean_newDL.csv") %>% 
+#   select(ID, date, GPP, GPP_loess) %>% 
+#   ggplot(aes(x=date))+
+#   geom_point(aes(y = GPP)) +
+#   geom_point(aes(y = GPP_loess), color = "red") +
+#   facet_wrap(vars(ID), scales = "free")
+# 
+# read_csv("data/3_timesat_outputs/smooth_time_series/smoothed_PhenoCam_sites_S2_VI_SCL45_10m_newDL.csv") %>%
+#   select(ID, date, GCC, GCC_loess) %>%
+#   ggplot(aes(x=date))+
+#   geom_point(aes(y = GCC)) +
+#   geom_point(aes(y = GCC_loess), color = "red") +
+#   facet_wrap(vars(ID), scales = "free")
