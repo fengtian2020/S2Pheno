@@ -339,8 +339,8 @@ gppmm <- gppm %>%
 gpp <- ggplot(data = gppm, aes(thres_VI, thres_Gvar)) +
   geom_tile(aes(fill = meanDiff)) + 
   geom_point(data = gppmm, aes(color = cor), size = 4) +
-  geom_text(data = gppmm, aes(label = round(cor, 2)), vjust = -1) +
-  geom_text(data = gppmm, aes(label = round(meanDiff)), vjust = 2) +
+  geom_text(data = gppmm, aes(label = round(cor, 2)), vjust = 2) +
+  geom_text(data = gppmm, aes(label = round(meanDiff)), vjust = -1) +
   scale_fill_distiller(name="Bias (Days)", direction = 1, limits = c(11, 91)) +
   scale_size(range = c(1, 7), 
              guide = guide_legend(
@@ -386,8 +386,8 @@ gccmm <- gccm %>%
 gcc <- ggplot(data = gccm, aes(thres_VI, thres_Gvar)) +
   geom_tile(aes(fill = meanDiff)) + 
   geom_point(data = gccmm, aes(color = cor), size = 4) +
-  geom_text(data = gccmm, aes(label = round(cor, 2)), vjust = -1) +
-  geom_text(data = gccmm, aes(label = round(meanDiff)), vjust = 2) +
+  geom_text(data = gccmm, aes(label = round(cor, 2)), vjust = 2) +
+  geom_text(data = gccmm, aes(label = round(meanDiff)), vjust = -1) +
   scale_fill_distiller(name="Bias (Days)", direction = 1, limits = c(11, 91)) +
   scale_size(range = c(1, 7), 
              guide = guide_legend(

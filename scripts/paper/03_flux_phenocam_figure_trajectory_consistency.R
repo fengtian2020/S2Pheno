@@ -93,7 +93,7 @@ VIcomp <- function(variable, brdfm) {
   if (variable == "GPP") {
     level_key <- c("Mixed forest" = "Mixed forest (5)",
                    "Coniferous forest" = "Evergreen forest (15)",
-                   "Broad-leaved forest" = "Decidous forest (6)",
+                   "Broad-leaved forest" = "Deciduous forest (6)",
                    "Grassland" = "Grassland (4)",
                    "Wetland" = "Wetland (5)",
                    "Agriculture" = "Agriculture (14)")
@@ -101,7 +101,7 @@ VIcomp <- function(variable, brdfm) {
   } else {
     level_key <- c("Mixed forest" = "Mixed forest (1)",
                    "Coniferous forest" = "Evergreen forest (7)",
-                   "Broad-leaved forest" = "Decidous forest (7)",
+                   "Broad-leaved forest" = "Deciduous forest (7)",
                    "Grassland" = "Grassland (8)",
                    "Wetland" = "Wetland (5)",
                    "Agriculture" = "Agriculture (5)")
@@ -149,7 +149,7 @@ VIcomp <- function(variable, brdfm) {
     scale_fill_manual(values = c("#FE6100", "#648FFF", "#DC267F"), 
                       labels = c("NDVI", "EVI2", "PPI")) +
     theme_bw(base_size = 15) +
-    labs(x = "", y = "Spatiotemperal correlation") +
+    labs(x = "", y = "Spatiotemporal correlation") +
     theme(legend.position = "top",
           legend.title = element_blank(), 
           legend.text = element_text(size = 15),
